@@ -37,6 +37,61 @@ Supports imputation of missing data segments.
 Includes a multimodal extension that integrates dietary tokens (macronutrients) to predict individual glycemic responses to food.
 
 
+
+------
+
+
+## 📊 Model Overview & Results
+
+### 1. The Core Concept: Language Modeling for Metabolism
+GluFormer treats continuous glucose monitoring data similarly to how Large Language Models (LLMs) treat text. By training on a massive cohort of over 10,000 individuals, the model utilizes a Transformer architecture to perform "next-token prediction" on glucose measurements. This approach allows it to learn the grammar of glucose dynamics without explicit labeling.
+
+![Main Idea](figures/1.png)
+
+### 2. Generative Architecture
+The model functions as an autoregressive generator. It takes a context window of past glucose levels (tokenized) and predicts the future trajectory. This generative capability allows for the creation of physiologically plausible synthetic data and the imputation of missing segments in CGM traces.
+
+![Architecture and Generation](figures/2.png)
+
+### 3. A Meaningful Latent Space
+GluFormer is not just a predictor; it is an encoder of metabolic health. The embeddings (latent representations) learned by the model naturally organize themselves by physiological phenotypes. As seen below, the representation space automatically clusters individuals based on postprandial (post-meal) responses and fasting glucose levels without being explicitly supervised to do so.
+
+![Latent Space Phenotypes](figures/3.png)
+
+### 4. Robust Generalization
+A key strength of GluFormer is its ability to generalize. The embeddings capture a "manifold of glycemic health" that remains robust across:
+* **Diverse Pathologies:** Healthy, Pre-diabetic, T1D, T2D, GDM, and cancer patients.
+* **Geography & Hardware:** 19 external cohorts across 5 countries and 8 different CGM devices.
+
+![Generalization Map](figures/4.png)
+
+### 5. State-of-the-Art Performance
+When benchmarked against standard clinical metrics, GluFormer demonstrates superior predictive power. It achieves higher ROC AUC scores for diabetes prediction across multiple time horizons (At collection, 2-year, and 4-year), significantly outperforming the standard composite CGM scores and the Glucose Management Indicator (GMI).
+
+![Benchmarking Performance](figures/5.png)
+
+### 6. Forecasting Disease Trajectories
+For individuals already at risk (pre-diabetic), GluFormer can distinguish between those likely to deteriorate and those likely to improve. In the figure below, the top quartile (Q4) of GluFormer risk scores correctly identified patients whose HbA1c would rise over a 2-year follow-up, whereas standard HbA1c quartiles failed to show significant differentiation.
+
+![Trajectory Forecasting](figures/6.png)
+
+### 7. Long-Term Diabetes Prediction (12-Year Horizon)
+The model's predictive power extends far into the future. In a 12-year longitudinal study, GluFormer successfully stratified patients into distinct risk groups for developing diabetes ($p = 2.3 \times 10^{-6}$). In comparison, the clinical gold standard (HbA1c) showed no significant predictive power for diabetes development over this timeframe.
+
+![Long Term Diabetes Prediction](figures/7.png)
+
+### 8. Mortality Risk Prediction
+The same predictive capability holds for cardiovascular outcomes. GluFormer embeddings successfully ranked individuals by risk of cardiovascular-related death over a decade-long period. High-risk groups identified by GluFormer showed a steep cumulative death event curve, while HbA1c-based ranking was non-significant.
+
+![Mortality Prediction](figures/8.png)
+
+### 9. Multimodal Integration (Diet)
+GluFormer supports multimodal inputs. By integrating dietary tokens (carbohydrates, proteins, fats) alongside glucose tokens, the model can simulate individual glycemic responses to specific foods. This reduces the Mean Absolute Error (MAE) of predictions and enables "Digital Twin" simulations to test how a patient might react to different meals (e.g., Pizza vs. Salad).
+
+![Multimodal Diet Integration](figures/9.png)
+
+---------
+
 ## 📂 Repository Structure
 
 The codebase is organized into modular components reflecting the pipeline described in the publication:
