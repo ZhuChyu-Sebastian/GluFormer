@@ -8,6 +8,35 @@ This repository contains the official implementation of the paper. The model use
 
 ---
 
+## 🌟 Key Capabilities
+
+GluFormer is designed to serve as a generalizable backbone for metabolic health AI. Its core capabilities include:
+
+**Foundation Model Pretraining:**
+
+Trained on a massive dataset of mostly non-diabetic adults.
+
+Generalizes across 19 external cohorts, spanning 5 countries, 8 different CGM devices, and diverse metabolic states (T1D, T2D, GDM, Obesity).
+
+**Risk Stratification & Prediction:**
+
+Diabetes Risk: Outperforms baseline HbA1c in predicting the progression from prediabetes to diabetes.
+
+Long-term Outcomes: Identified individuals at high risk for cardiovascular mortality and incident diabetes in a cohort with an 11-year follow-up.
+
+Clinical Trials: Improves outcome forecasting for dietary and pharmacologic interventions.
+
+**Generative Modeling:**
+
+Autoregressively generates physiologically plausible synthetic CGM trajectories (24h horizons).
+
+Supports imputation of missing data segments.
+
+**Multimodal Integration:**
+
+Includes a multimodal extension that integrates dietary tokens (macronutrients) to predict individual glycemic responses to food.
+
+
 ## 📂 Repository Structure
 
 The codebase is organized into modular components reflecting the pipeline described in the publication:
