@@ -155,9 +155,11 @@ for epoch in range(num_epochs):
     model.train()
     for i, batch in enumerate(train_dataloader):
         inputs = batch.to(device)
-        mask = (inputs == PAD_TOKEN)
+        
         # Shift the inputs to the right for the target sequence
         inputs, targets = inputs[:, :-1], inputs[:, 1:]
+
+        mask = (inputs == PAD_TOKEN)
 
         model.zero_grad()
         logits = model(inputs, mask=mask)
