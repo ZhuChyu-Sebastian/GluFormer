@@ -205,14 +205,6 @@ GluFormer is designed to support various clinical and machine learning tasks. Th
     The architecture supports the integration of dietary tokens alongside glucose tokens, allowing for the assessment of individual glycemic responses to food intake.
 
 -----
-
-## Misc.
-
-Instalation time: standart
-
-Trained useing NVIDIA GPUS (A40 & A100)
-
-Status: Adding code is currently in progress.
  
 ## 📚 Citation
 
