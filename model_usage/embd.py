@@ -91,7 +91,7 @@ for i, (glucoses, idx) in enumerate(dataloader):
     print(f"sample {i}/{len(dataloader)}")
     idx = idx[0]
     glucoses = glucoses.squeeze().to(device)
-    embd = model(glucoses.unsqueeze(0), mask_token_id=PAD_TOKEN, ret_embds=True)[1]
+    embd = model(glucoses.unsqueeze(0), ret_embds=True)[1]
     embd = embd.squeeze().max(dim=0)[0]
     embds.append(embd.squeeze().detach().cpu().numpy())
     ids.append(idx)
