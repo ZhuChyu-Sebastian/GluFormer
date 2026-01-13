@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 import wandb
 import random
 import torch
+from train_model.train_GluFormer import TransformerModel
 
 hyperparameter_defaults = dict(
     epochs=110,
