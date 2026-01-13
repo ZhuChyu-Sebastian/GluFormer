@@ -75,8 +75,8 @@ For individuals already at risk (pre-diabetic), GluFormer can distinguish betwee
 
 ![Trajectory Forecasting](figures/6.png)
 
-### 7. Long-Term Diabetes Prediction (12-Year Horizon)
-The model's predictive power extends far into the future. In a 12-year longitudinal study, GluFormer successfully stratified patients into distinct risk groups for developing diabetes ($p = 2.3 \times 10^{-6}$). In comparison, the clinical gold standard (HbA1c) showed no significant predictive power for diabetes development over this timeframe.
+### 7. Long-Term Diabetes Prediction (11-Year Horizon)
+The model's predictive power extends far into the future. In an 11-year longitudinal study (AEGIS cohort, median follow-up), GluFormer successfully stratified patients into distinct risk groups for developing diabetes ($p = 2.3 \times 10^{-6}$). In comparison, the clinical gold standard (HbA1c) showed no significant predictive power for diabetes development over this timeframe.
 
 ![Long Term Diabetes Prediction](figures/7.png)
 
@@ -154,17 +154,19 @@ conda activate gluformer
 ```
 
 **3. Install dependencies:**
-You can install the required packages using pip.
-*Note: Installation time is standard.*
+You can install the required packages using pip or uv.
 
 ```bash
-# Core PyTorch installation
-pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1
+# Option A: Using requirements.txt (recommended)
+pip install -r requirements.txt
 
-# Install remaining dependencies
+# Option B: Using uv (faster)
+uv pip install -r requirements.txt
+
+# Option C: Manual installation
+pip install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1
 pip install pandas==2.2.2 numpy==1.26.4 scikit-learn==1.5.0 scipy==1.14.0 \
-seaborn==0.13.2 matplotlib==3.9.0 matplotlib-inline==0.1.6 \
-wandb==0.17.3 umap-learn==0.5.5 tqdm==4.66.4 torchelastic==0.2.2
+    seaborn==0.13.2 matplotlib==3.9.0 wandb==0.17.3 umap-learn==0.5.5 tqdm==4.66.4
 ```
 
 -----
@@ -207,4 +209,19 @@ GluFormer is designed to support various clinical and machine learning tasks. Th
 -----
  
 ## 📚 Citation
+
+If you use GluFormer in your research, please cite our paper:
+
+```bibtex
+@article{lutsker2026gluformer,
+  title={A foundation model for continuous glucose monitoring data},
+  author={Lutsker, Guy and Sapir, Gal and Shilo, Smadar and Merino, Jordi and Godneva, Anastasia and Greenfield, Jerry R. and Samocha-Bonet, Dorit and Dhir, Raja and Gude, Francisco and Mannor, Shie and Meirom, Eli and Xing, Eric P. and Chechik, Gal and Rossman, Hagai and Segal, Eran},
+  journal={Nature},
+  year={2026},
+  publisher={Springer Nature},
+  doi={10.1038/s41586-025-09925-9}
+}
+```
+
+**Paper:** [https://www.nature.com/articles/s41586-025-09925-9](https://www.nature.com/articles/s41586-025-09925-9)
 

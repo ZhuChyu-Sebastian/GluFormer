@@ -6,6 +6,15 @@ from sklearn.linear_model import Ridge
 
 seed = 10
 
+
+def normalize_participant_id(x):
+    """Extract participant ID by taking digits 1-7 (skip first digit prefix).
+
+    The data files use different ID prefixes (1xxx vs 2xxx) for the same participants.
+    This normalizes them for matching.
+    """
+    return int(str(int(x))[1:7])
+
 hyperparameter_defaults = dict(
     seed=42,
     measure='bt__hba1c',
@@ -49,6 +58,11 @@ else:
     raise ValueError("wrong pred_from")
 
 covars = data
+
+# Normalize covars index to participant IDs (strip prefix digit)
+covars.index = covars.index.map(normalize_participant_id)
+covars = covars.groupby(covars.index).mean()  # Average if duplicate participant IDs
+
 path = "Shanghai_results.csv"
 targets_to_predict = pd.read_csv(path, index_col=0)
 # set the first col as index
@@ -56,6 +70,9 @@ targets_to_predict = targets_to_predict.iloc[:, 0]
 
 # remove rows with nan
 targets_to_predict = targets_to_predict[~targets_to_predict.isna()]
+
+# Normalize targets index to participant IDs (strip prefix digit)
+targets_to_predict.index = targets_to_predict.index.map(normalize_participant_id)
 targets_to_predict = targets_to_predict.groupby(targets_to_predict.index).mean()
 
 # intersection of index between covars and targets_to_predict
