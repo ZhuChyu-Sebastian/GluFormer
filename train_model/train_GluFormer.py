@@ -43,7 +43,7 @@ torch.cuda.manual_seed_all(seed)
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
-chunks = 128
+chunks = 460
 chunk_size = config.chunk_size  # Fixed size for each chunk
 PAD_TOKEN = chunks  # Assuming -1 is not a valid glucose measurement
 
