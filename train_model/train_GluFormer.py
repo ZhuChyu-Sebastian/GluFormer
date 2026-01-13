@@ -90,7 +90,7 @@ class TransformerModel(nn.Module):
         pos_embedding[:, 1::2] = torch.cos(position * div_term)
         return pos_embedding
 
-    def forward(self, tokens, mask=None):
+    def forward(self, tokens, mask=None, ret_embds=False):
         # Compute the embeddings
         token_embeddings = self.embedding(tokens)  # [Batch, Seq, Emb]
         position_embeddings = self.pos_embedding[:tokens.size(1), :].unsqueeze(0).to(tokens.device)
@@ -108,6 +108,9 @@ class TransformerModel(nn.Module):
         transformer_output = self.transformer(embeddings.permute(1, 0, 2), mask=causal_mask,
                                               src_key_padding_mask=src_key_padding_mask)
         logits = self.linear(transformer_output.permute(1, 0, 2))
+
+        if ret_embds:
+            return logits, transformer_output
 
         return logits
 
