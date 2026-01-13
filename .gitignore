@@ -50,3 +50,6 @@ generated_files/
 
 # Data files (large)
 *.csv.gz
+
+# PDFs (avoid accidentally committing protected papers)
+*.pdf
