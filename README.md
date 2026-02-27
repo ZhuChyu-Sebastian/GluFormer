@@ -225,3 +225,20 @@ If you use GluFormer in your research, please cite our paper:
 
 **Paper:** [https://www.nature.com/articles/s41586-025-09925-9](https://www.nature.com/articles/s41586-025-09925-9)
 
+
+## 🧭 D1NAMO Multimodal Workflow (CGM + PPG + IMU + Temperature + Meal)
+
+For running an end-to-end multimodal forecasting pipeline on D1NAMO-like tabular data, use:
+
+```bash
+python demo/d1namo_gluformer_pipeline.py \
+  --mode all \
+  --input_csv data/d1namo_merged.csv \
+  --workdir outputs/d1namo_run
+```
+
+A detailed Chinese technical report is available at:
+
+- `reports/D1NAMO_GluFormer_技术报告.md`
+
+The script also supports a `--mode demo` path that generates synthetic data and validates the complete pipeline wiring.
