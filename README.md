@@ -242,3 +242,18 @@ A detailed Chinese technical report is available at:
 - `reports/D1NAMO_GluFormer_技术报告.md`
 
 The script also supports a `--mode demo` path that generates synthetic data and validates the complete pipeline wiring.
+
+### D1NAMO raw-data preprocessing (from freshly downloaded dataset)
+
+If you have just downloaded D1NAMO raw files (multiple sensor CSV/TSV/TXT files), first run:
+
+```bash
+python create_data_as_tokens/preprocess_d1namo.py \
+  --input_dir /path/to/D1NAMO_raw \
+  --output_csv data/d1namo_merged.csv \
+  --summary_json data/d1namo_preprocess_summary.json \
+  --freq 5min
+```
+
+This script auto-discovers CGM/PPG/IMU/temperature/meal streams by filename + column heuristics,
+parses timestamps, resamples to a unified timeline, and exports one merged training table.
