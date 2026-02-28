@@ -228,14 +228,18 @@ If you use GluFormer in your research, please cite our paper:
 
 ## 🧭 PhyscioCGM 数据集训练与预测（`dataset/`）
 
-如果你已经将预处理后的 PhyscioCGM 数据放在 `dataset/*.csv`（并包含 `Glucose` 列），可以直接使用下面两个脚本：
+如果你已经将预处理后的 PhyscioCGM 数据放在 `dataset/*.csv`，可以使用**双塔/跨模态注意力融合**方案训练：
 
-### 1) 训练
+- 塔1（主塔）：`Glucose` token 序列
+- 塔2（辅塔）：`E4_HR, EDA, TEMP, BVP, E4_Acc_x_x, E4_Acc_y_x, E4_Acc_z_x, Accel_Vertical, Accel_Lateral, Accel_Sagittal, BreathingWaveform`
+- 融合方式：主塔 query 对辅塔 key/value 做 cross-attention，然后进行自回归 next-token 训练。
+
+### 1) 训练（双塔跨模态）
 
 ```bash
 python -m train_model.train_physiocgm \
   --dataset-dir dataset \
-  --output train_model/physiocgm_gluformer.pt \
+  --output train_model/physiocgm_gluformer_multimodal.pt \
   --glucose-column Glucose \
   --time-column Time \
   --seq-len 128 \
@@ -243,11 +247,13 @@ python -m train_model.train_physiocgm \
   --epochs 10
 ```
 
-### 2) 预测
+如果你的列名不同，可通过 `--sensor-columns col1,col2,...` 自定义传感器输入列。
+
+### 2) 预测（双塔跨模态）
 
 ```bash
 python -m model_usage.predict_physiocgm \
-  --checkpoint train_model/physiocgm_gluformer.pt \
+  --checkpoint train_model/physiocgm_gluformer_multimodal.pt \
   --input-csv dataset/0.csv \
   --output-csv model_usage/physiocgm_predictions.csv \
   --context-len 128 \

@@ -1,10 +1,11 @@
 import argparse
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 
-from train_model.modeling import TransformerModel
+from train_model.modeling import CrossModalGluFormer
 
 
 def sample_top_k(logits: torch.Tensor, k: int) -> torch.Tensor:
@@ -19,8 +20,8 @@ def sample_top_k(logits: torch.Tensor, k: int) -> torch.Tensor:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="使用训练好的 GluFormer 预测未来 CGM token")
-    parser.add_argument("--checkpoint", type=Path, default=Path("train_model/physiocgm_gluformer.pt"))
+    parser = argparse.ArgumentParser(description="使用双塔/跨模态注意力 GluFormer 预测未来 CGM token")
+    parser.add_argument("--checkpoint", type=Path, default=Path("train_model/physiocgm_gluformer_multimodal.pt"))
     parser.add_argument("--input-csv", type=Path, default=Path("dataset/0.csv"))
     parser.add_argument("--output-csv", type=Path, default=Path("model_usage/physiocgm_predictions.csv"))
     parser.add_argument("--glucose-column", type=str, default="Glucose")
@@ -32,8 +33,9 @@ def main() -> None:
 
     payload = torch.load(args.checkpoint, map_location="cpu")
     config = payload["config"]
-    model = TransformerModel(
+    model = CrossModalGluFormer(
         vocab_size=config["vocab_size"],
+        sensor_dim=config["sensor_dim"],
         n_embd=config["n_embd"],
         n_heads=config["n_heads"],
         n_layers=config["n_layers"],
@@ -48,6 +50,14 @@ def main() -> None:
     if args.time_column in df.columns:
         df = df.sort_values(args.time_column)
 
+    sensor_cols = config["sensor_columns"]
+    missing_sensor_cols = [col for col in sensor_cols if col not in df.columns]
+    if missing_sensor_cols:
+        raise ValueError(f"输入 CSV 缺少传感器列: {missing_sensor_cols}")
+
+    glucose_mask = df[args.glucose_column].notna()
+    df = df.loc[glucose_mask, [args.glucose_column] + sensor_cols].copy()
+
     glucose_min = config["glucose_min"]
     glucose_max = config["glucose_max"]
     values = (
@@ -58,19 +68,33 @@ def main() -> None:
         .round()
         .astype(int)
     )
-    tokens = torch.tensor((values - glucose_min).to_numpy(), dtype=torch.long).unsqueeze(0)
+    glucose_tokens = torch.tensor((values - glucose_min).to_numpy(), dtype=torch.long).unsqueeze(0)
 
-    if tokens.size(1) < args.context_len:
+    sensor_df = df[sensor_cols].astype(float).ffill().bfill().fillna(0.0)
+    sensor_values = sensor_df.to_numpy(dtype=np.float32)
+    sensor_mean = np.array(config["sensor_mean"], dtype=np.float32)
+    sensor_std = np.array(config["sensor_std"], dtype=np.float32)
+    sensor_values = (sensor_values - sensor_mean) / sensor_std
+    sensor_features = torch.tensor(sensor_values, dtype=torch.float32).unsqueeze(0)
+
+    if glucose_tokens.size(1) < args.context_len:
         raise ValueError(f"输入序列长度不足 context-len={args.context_len}")
 
-    generated = tokens[:, -args.context_len :]
+    generated_tokens = glucose_tokens[:, -args.context_len :]
+    sensor_context = sensor_features[:, -args.context_len :, :]
+
     with torch.no_grad():
         for _ in range(args.predict_steps):
-            logits = model(generated[:, -config["max_seq_length"] :])[:, -1, :]
+            token_input = generated_tokens[:, -config["max_seq_length"] :]
+            sensor_input = sensor_context[:, -config["max_seq_length"] :, :]
+            logits = model(token_input, sensor_input)[:, -1, :]
             next_token = sample_top_k(logits, args.top_k)
-            generated = torch.cat([generated, next_token], dim=1)
+            generated_tokens = torch.cat([generated_tokens, next_token], dim=1)
 
-    pred_tokens = generated[0, -args.predict_steps :].numpy()
+            # 预测步无未来传感器观测，使用最后一个可用传感器向量进行延拓
+            sensor_context = torch.cat([sensor_context, sensor_context[:, -1:, :]], dim=1)
+
+    pred_tokens = generated_tokens[0, -args.predict_steps :].numpy()
     pred_glucose = pred_tokens + glucose_min
 
     out_df = pd.DataFrame(
