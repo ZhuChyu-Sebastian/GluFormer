@@ -2,7 +2,7 @@ import pandas as pd
 from tqdm import tqdm
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from train_model.train_GluFormer import TransformerModel
+from train_model.modeling import TransformerModel
 import torch.optim as optim
 import wandb
 import random
